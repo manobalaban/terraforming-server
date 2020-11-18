@@ -8,6 +8,7 @@ import com.terraforming.server.constans.EffectType;
 public class CardEffect {
 	
 	private String id;
+	private boolean triggeredByEveryne = false;
 	private List<EffectType> types = new CopyOnWriteArrayList<EffectType>();
 	
 	public CardEffect() {}
@@ -16,6 +17,11 @@ public class CardEffect {
 		this.id = id;
 		this.types = types;
 	}
+	
+	public CardEffect(String id, List<EffectType> types, boolean triggeredByEveryne) {
+		this(id, types);
+		this.triggeredByEveryne = triggeredByEveryne;
+	}
 
 	public String getId() {
 		return id;
@@ -23,5 +29,9 @@ public class CardEffect {
 
 	public List<EffectType> getTypes() {
 		return types;
+	}
+
+	public boolean isTriggeredByEveryne() {
+		return triggeredByEveryne;
 	}
 }

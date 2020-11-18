@@ -12,7 +12,6 @@ public class CardsHandler {
 	private static List<String> cardDeck = new CopyOnWriteArrayList<String>();
 	private static List<String> burnedCards = new CopyOnWriteArrayList<String>();
 	private static List<String> corporations = new CopyOnWriteArrayList<String>();
-	private static List<String> preludes = new CopyOnWriteArrayList<String>();
 	
 	private CardsHandler() {}
 	
@@ -20,7 +19,6 @@ public class CardsHandler {
 		if(instance == null) {
 			cardDeck = TerraformingMarsInitialize.initCards(345, "");
 			corporations = TerraformingMarsInitialize.initCards(38, "c");
-			preludes = TerraformingMarsInitialize.initCards(35, "p");
 			instance = new CardsHandler();
 		}
 		return instance;
@@ -41,6 +39,10 @@ public class CardsHandler {
 		return result;
 	}
 	
+	public void burnCard(String cardId) {
+		burnedCards.add(cardId);
+	}
+	
 	public void burneCards(List<String> cards) {
 		burnedCards.addAll(cards);
 	}
@@ -55,15 +57,6 @@ public class CardsHandler {
 		for(int i = 0; i < q; i++) {
 			result.add(corporations.get(0));
 			corporations.remove(0);
-		}
-		return result;
-	}
-	
-	public List<String> getPreludes(int q) {
-		List<String> result = new CopyOnWriteArrayList<String>();
-		for(int i = 0; i < q; i++) {
-			result.add(preludes.get(0));
-			preludes.remove(0);
 		}
 		return result;
 	}

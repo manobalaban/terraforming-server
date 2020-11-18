@@ -28,11 +28,4 @@ public class BasicCard {
 	public Map<Resource, Integer> getResources() {
 		return resources;
 	}
-	
-	public static void main(String[] args) {
-		int t = 20;
-		int s = -2;
-		t += s;
-		System.out.println(t);
-	}
 }

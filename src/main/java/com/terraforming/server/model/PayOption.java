@@ -6,12 +6,12 @@ import com.terraforming.server.constans.Resource;
 
 public class PayOption {
 	private boolean possible;
-	private int sum;
+	private int price;
 	private Map<Resource, Integer> resourcesWithValue;	
 	
-	public PayOption(boolean possible, int sum,  Map<Resource, Integer> resourcesWithValue) {
+	public PayOption(boolean possible, int price,  Map<Resource, Integer> resourcesWithValue) {
 		this.possible = possible;
-		this.sum = sum;
+		this.price = price;
 		this.resourcesWithValue = resourcesWithValue;
 	}
 
@@ -19,8 +19,8 @@ public class PayOption {
 		return possible;
 	}
 	
-	public int getSum() {
-		return sum;
+	public int getPrice() {
+		return price;
 	}
 
 	public  Map<Resource, Integer> getResources() {

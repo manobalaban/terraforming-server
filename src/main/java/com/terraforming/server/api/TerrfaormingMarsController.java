@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.terraforming.server.aplication.AwardsHandler;
+import com.terraforming.server.aplication.MilestonesHandler;
+import com.terraforming.server.aplication.PhaseHandler;
 import com.terraforming.server.aplication.PlayersHandler;
-import com.terraforming.server.constans.GamePhase;
 import com.terraforming.server.effect.EffectHandler;
 import com.terraforming.server.model.PayOption;
 import com.terraforming.server.model.Player;
@@ -30,6 +33,9 @@ public class TerrfaormingMarsController {
 	
 	private PlayersHandler playersHandler = PlayersHandler.getInstance();
 	private EffectHandler effectHandler = EffectHandler.getInstance();
+	private PhaseHandler phaseHandler = PhaseHandler.getIntance();
+	private MilestonesHandler milestonesHandler = MilestonesHandler.getInstance();
+	private AwardsHandler awardsHandler = AwardsHandler.getInstance();
 	
 	private static List<SseEmitter> emitters = new CopyOnWriteArrayList<SseEmitter>();
 	private final String UPDATE_ALL_PLAYER = "updateAllPlayer";
@@ -49,19 +55,19 @@ public class TerrfaormingMarsController {
 		boolean ready = playersHandler.choseFirstTenCard(player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
-			sendEvent(NEXT_PHASE, "phase", GamePhase.CHOSE_CORP);
+			sendEvent(NEXT_PHASE, "phase", phaseHandler.nextPhase());
 		}
 		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
 	}
 	
 	@PutMapping("/choseCorporation")
 	public ResponseEntity<String> choseCorporation(@RequestBody Player player) {
-		effectHandler.checkCorpPlayedEffect(player.getCorporation());
+		effectHandler.checkCorpPlayedEffect(player);
 		//FIRST ACTION: c6 c8 c14 c16 c21 c22 c23 c26 c35 c36 c38
 		boolean ready = playersHandler.choseCorporation(player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
-			sendEvent(NEXT_PHASE, "phase", GamePhase.FIRST_RESEARCH);
+			sendEvent(NEXT_PHASE, "phase", phaseHandler.nextPhase());
 		}
 		return new ResponseEntity<String>(player.getCorporation(), HttpStatus.OK);
 	}
@@ -76,10 +82,37 @@ public class TerrfaormingMarsController {
 		boolean ready = playersHandler.research(player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
-			sendEvent(NEXT_PHASE, "phase", GamePhase.FIRST_RESEARCH);
+			sendEvent(NEXT_PHASE, "phase",phaseHandler.nextPhase());
 		}
 		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
 	}
+	
+	@PutMapping("/action/milestoneIntention/{milestone}")
+	public ResponseEntity<PayOption> milestoneIntention(@PathVariable String milestone, @RequestBody Player player) {
+		return new ResponseEntity<PayOption>(effectHandler.checkPayForMilestone(milestone, player), HttpStatus.OK);
+	}
+	
+	@PutMapping("/action/milestone/{milestone}")
+	public ResponseEntity<Player> milestone(@PathVariable String milestone, @RequestBody Player player) {
+		milestonesHandler.setMilestone(milestone, player);
+		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
+		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
+	}
+	
+	@PutMapping("/action/awardIntention")
+	public ResponseEntity<PayOption> awardIntention(@RequestBody Player player) {
+		return new ResponseEntity<PayOption>(effectHandler.checkPayForAward(player), HttpStatus.OK);
+	}
+	
+	@PutMapping("/action/award/{award}")
+	public ResponseEntity<Player> award(@PathVariable String award, @RequestBody Player player) {
+		awardsHandler.setAward(award, player);
+		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
+		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
+	}
+	
+	
+	//SSE
 	
 	@CrossOrigin
 	@RequestMapping(value = "/subscribeUsers", consumes = MediaType.ALL_VALUE)

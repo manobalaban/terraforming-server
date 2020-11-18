@@ -15,6 +15,7 @@ public class Player {
 	private boolean ready = false;
 	private int order = 0;
 	private boolean active = false;
+	private boolean firstActionDone = false;
 	
 	private int tr = 20;
 	private Map<Resource, Integer> resources;
@@ -26,8 +27,6 @@ public class Player {
 	private List<String> playedCards = new CopyOnWriteArrayList<>();
 	private String corporation;
 	private List<String> corporationsToChose = new CopyOnWriteArrayList<>();
-	private List<String> preludes = new CopyOnWriteArrayList<>();
-	private List<String> preludesToChose = new CopyOnWriteArrayList<>();
 	
 	private List<CardAction> actions = new CopyOnWriteArrayList<CardAction>(); 
 	private List<CardEffect> effects = new CopyOnWriteArrayList<CardEffect>(); 
@@ -141,14 +140,6 @@ public class Player {
 		this.corporation = corporation;
 	}
 
-	public List<String> getPreludes() {
-		return preludes;
-	}
-
-	public void setPreludes(List<String> preludes) {
-		this.preludes = preludes;
-	}
-
 	public boolean isReady() {
 		return ready;
 	}
@@ -163,14 +154,6 @@ public class Player {
 
 	public void setCorporationsToChose(List<String> corporationsToChose) {
 		this.corporationsToChose = corporationsToChose;
-	}
-
-	public List<String> getPreludesToChose() {
-		return preludesToChose;
-	}
-
-	public void setPreludesToChose(List<String> preludesToChose) {
-		this.preludesToChose = preludesToChose;
 	}
 
 	public List<CardAction> getActions() {
@@ -204,4 +187,13 @@ public class Player {
 	public void AddTags(List<Tag> tags) {
 		this.tags.addAll(tags);
 	}
+
+	public boolean isFirstActionDone() {
+		return firstActionDone;
+	}
+
+	public void setFirstActionDone(boolean firstActionDone) {
+		this.firstActionDone = firstActionDone;
+	}
+
 }

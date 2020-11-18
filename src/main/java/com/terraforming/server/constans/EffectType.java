@@ -1,11 +1,11 @@
 package com.terraforming.server.constans;
 
 public enum EffectType {
+	PAY_INTENTION,
 	RESEARCH_PRICE,
 	PAY_FOR_CARD,
 	
 	CORPORATION_PLAY,
-	PRELUDES_PLAY,
 	
 	CARD_PLAY_INTENTION,
 	CARD_PLAY,
@@ -24,4 +24,7 @@ public enum EffectType {
 	CHANGE_RESOURCE,
 	
 	PRODUCTION,
+	
+	MILESTONE,
+	AWARD,
 }
