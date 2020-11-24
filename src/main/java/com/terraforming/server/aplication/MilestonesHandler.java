@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.terraforming.server.constans.Resource;
 import com.terraforming.server.constans.Tag;
 import com.terraforming.server.initialize.TerraformingMarsInitialize;
+import com.terraforming.server.model.PayOption;
 import com.terraforming.server.model.Player;
 
 public class MilestonesHandler {
@@ -30,17 +31,25 @@ public class MilestonesHandler {
 	}
 	
 	public void setMilestone(String milestone, Player actualPlayer) {
-		milestones.put(milestone, playersHandler.pay(actualPlayer));
+		Player player = playersHandler.getPlayer(actualPlayer.getName());
+		player.setResources(actualPlayer.getPayingWith());
+		player.setPayingWith(null);
+		milestones.put(milestone, player);
 	}
 	
-	public boolean checkMilestone(String milestone, Player player) {
+	public PayOption checkPayForMilestone(String milestone, Player actualPlayer) {
 		int achievedMilestones = 0;
 		for(Map.Entry<String, Player> stone : milestones.entrySet()) {
 			if(stone.getValue() != null) {
 				achievedMilestones ++;
 			}
 		}
-		return achievedMilestones < 7 ? checkMilestones(milestone, player) : false;
+		boolean milestoneAvailable = achievedMilestones < 7 ? checkMilestones(milestone, actualPlayer) : false;
+		int price = 8;
+		if(!milestoneAvailable) {
+			return new PayOption(false);
+		}
+		return TerraformingMarsHandler.checkPayIntention(actualPlayer, price);
 	}
 	
 	private boolean checkMilestones(String milestone, Player player) {

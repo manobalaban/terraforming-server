@@ -7,6 +7,7 @@ public class OnCardCollected {
 	private String id;
 	private int quantity;
 	private CardResource resource;
+	private String owner;
 	
 	public OnCardCollected() {}
 	
@@ -30,6 +31,14 @@ public class OnCardCollected {
 
 	public CardResource getResource() {
 		return resource;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 	
 }

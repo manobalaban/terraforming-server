@@ -19,10 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.terraforming.server.aplication.AwardsHandler;
+import com.terraforming.server.aplication.CardsHandler;
+import com.terraforming.server.aplication.ColoniesHandler;
+import com.terraforming.server.aplication.GlobalParameterHandler;
 import com.terraforming.server.aplication.MilestonesHandler;
 import com.terraforming.server.aplication.PhaseHandler;
 import com.terraforming.server.aplication.PlayersHandler;
-import com.terraforming.server.effect.EffectHandler;
+import com.terraforming.server.aplication.StandardProjectHandler;
+import com.terraforming.server.aplication.TerraformingMarsHandler;
+import com.terraforming.server.aplication.TileHandler;
+import com.terraforming.server.aplication.TurmoilHandler;
+import com.terraforming.server.model.GameData;
 import com.terraforming.server.model.PayOption;
 import com.terraforming.server.model.Player;
 
@@ -32,14 +39,19 @@ import com.terraforming.server.model.Player;
 public class TerrfaormingMarsController {
 	
 	private PlayersHandler playersHandler = PlayersHandler.getInstance();
-	private EffectHandler effectHandler = EffectHandler.getInstance();
+	private CardsHandler cardsHandler = CardsHandler.getInstance();
 	private PhaseHandler phaseHandler = PhaseHandler.getIntance();
 	private MilestonesHandler milestonesHandler = MilestonesHandler.getInstance();
 	private AwardsHandler awardsHandler = AwardsHandler.getInstance();
+	private TileHandler tileHandler = TileHandler.getInstance();
+	private GlobalParameterHandler globalParameterHandler = GlobalParameterHandler.getInstance();
+	private ColoniesHandler coloniesHandler = ColoniesHandler.getInstance();
+	private TurmoilHandler turmoilHandler = TurmoilHandler.getInstance();
+	private StandardProjectHandler standardProjectHandler = StandardProjectHandler.getInstance();
 	
 	private static List<SseEmitter> emitters = new CopyOnWriteArrayList<SseEmitter>();
 	private final String UPDATE_ALL_PLAYER = "updateAllPlayer";
-	private final String NEXT_PHASE = "nextPhase";
+	private final String UPDATE_TABLE = "updateTable";
 
 	@GetMapping("/players")
 	public ResponseEntity<List<Player>> getPlayers(@RequestParam(required = false) String name) {
@@ -50,67 +62,125 @@ public class TerrfaormingMarsController {
 		return new ResponseEntity<List<Player>>(playersHandler.getPlayers(), HttpStatus.OK);
 	}
 	
+	@GetMapping("/table")
+	public ResponseEntity<GameData> getTiles() {
+		return new ResponseEntity<GameData>(TerraformingMarsHandler.getGameData(), HttpStatus.OK);
+	}
+	
 	@PutMapping("/choseFirstTenCards")
 	public ResponseEntity<Player> choseFirstTenCards(@RequestBody Player player) {
-		boolean ready = playersHandler.choseFirstTenCard(player);
+		boolean ready = cardsHandler.choseFirstTenCard(player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
-			sendEvent(NEXT_PHASE, "phase", phaseHandler.nextPhase());
+			phaseHandler.nextPhase();
+			sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
 		}
 		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
 	}
 	
 	@PutMapping("/choseCorporation")
 	public ResponseEntity<String> choseCorporation(@RequestBody Player player) {
-		effectHandler.checkCorpPlayedEffect(player);
+		cardsHandler.checkCorpPlayedEffect(player);
 		//FIRST ACTION: c6 c8 c14 c16 c21 c22 c23 c26 c35 c36 c38
-		boolean ready = playersHandler.choseCorporation(player);
+		boolean ready = cardsHandler.choseCorporation(player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
-			sendEvent(NEXT_PHASE, "phase", phaseHandler.nextPhase());
+			phaseHandler.nextPhase();
+			sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
 		}
 		return new ResponseEntity<String>(player.getCorporation(), HttpStatus.OK);
 	}
 	
-	@PutMapping("/researchIntention")
+	@PutMapping("/research")
 	public ResponseEntity<PayOption> researchIntention(@RequestBody Player player) {
-		return new ResponseEntity<PayOption>(effectHandler.checkPayForResearchEffect(player), HttpStatus.OK);
-	}
-	
-	@PutMapping("/actualResearch")
-	public ResponseEntity<Player> actualResearch(@RequestBody Player player) {
-		boolean ready = playersHandler.research(player);
+		if(player.getPayingWith() == null) {
+			return new ResponseEntity<PayOption>(cardsHandler.checkPayForResearchEffect(player), HttpStatus.OK);
+		}
+		boolean ready = cardsHandler.research(player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
-			sendEvent(NEXT_PHASE, "phase",phaseHandler.nextPhase());
+			phaseHandler.nextPhase();
+			sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
 		}
-		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
-	}
-	
-	@PutMapping("/action/milestoneIntention/{milestone}")
-	public ResponseEntity<PayOption> milestoneIntention(@PathVariable String milestone, @RequestBody Player player) {
-		return new ResponseEntity<PayOption>(effectHandler.checkPayForMilestone(milestone, player), HttpStatus.OK);
+		return new ResponseEntity<PayOption>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/milestone/{milestone}")
-	public ResponseEntity<Player> milestone(@PathVariable String milestone, @RequestBody Player player) {
+	public ResponseEntity<PayOption> milestone(@PathVariable String milestone, @RequestBody Player player) {
+		if(player.getPayingWith() == null) {
+			return new ResponseEntity<PayOption>(milestonesHandler.checkPayForMilestone(milestone, player), HttpStatus.OK);
+		}
 		milestonesHandler.setMilestone(milestone, player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
-	}
-	
-	@PutMapping("/action/awardIntention")
-	public ResponseEntity<PayOption> awardIntention(@RequestBody Player player) {
-		return new ResponseEntity<PayOption>(effectHandler.checkPayForAward(player), HttpStatus.OK);
+		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		return new ResponseEntity<PayOption>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/award/{award}")
-	public ResponseEntity<Player> award(@PathVariable String award, @RequestBody Player player) {
+	public ResponseEntity<PayOption> award(@PathVariable String award, @RequestBody Player player) {
+		if(player.getPayingWith() == null) {
+			return new ResponseEntity<PayOption>(awardsHandler.checkPayForAward(player), HttpStatus.OK);
+		}
 		awardsHandler.setAward(award, player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
+		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		return new ResponseEntity<PayOption>(HttpStatus.OK);
 	}
 	
+	@PutMapping("/action/planting/{coordinate}")
+	public ResponseEntity<PayOption> planting(@PathVariable String coordinate, @RequestBody Player player) {
+		if(player.getPayingWith() == null) {
+			return new ResponseEntity<PayOption>(tileHandler.checkPlantingEffect(player), HttpStatus.OK);
+		}
+		tileHandler.planting(coordinate, player);
+		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
+		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		return new ResponseEntity<PayOption>(HttpStatus.OK); 
+	}
+	
+	@PutMapping("/action/increaseTemperature")
+	public ResponseEntity<PayOption> increaseTemperature(@RequestBody Player player) {
+		if(player.getPayingWith() == null) {
+			return new ResponseEntity<PayOption>(globalParameterHandler.checkIncreaseTemperatureWithHeatEffect(player), HttpStatus.OK);
+		}
+		globalParameterHandler.increaseTemperature(true, player);
+		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
+		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		return new ResponseEntity<PayOption>(HttpStatus.OK);
+	}
+	
+	@PutMapping("/action/trade/{colony}")
+	public ResponseEntity<List<PayOption>> trade(@PathVariable String colony, @RequestBody Player player) {
+		if(player.getPayingWith() == null) {
+			return new ResponseEntity<List<PayOption>>(coloniesHandler.checkTradeEffect(player, colony), HttpStatus.OK);
+		}
+		coloniesHandler.trade(player, colony);
+		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
+		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		return new ResponseEntity<List<PayOption>>(HttpStatus.OK);
+	}
+	
+	@PutMapping("/action/buyDelegate/{party}")
+	public ResponseEntity<List<PayOption>> buyDelegate(@PathVariable String party, @RequestBody Player player) {
+		if(player.getPayingWith() == null) {
+			return new ResponseEntity<List<PayOption>>(turmoilHandler.checkBuyDelegateEffect(player), HttpStatus.OK);
+		}
+		turmoilHandler.buyDelegate(party, player);
+		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
+		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		return new ResponseEntity<List<PayOption>>(HttpStatus.OK);
+	}
+	
+	@PutMapping("/action/standardProject/{projectName}")
+	public ResponseEntity<PayOption> standardProject(@PathVariable String projectName, @RequestBody Player player) {
+		if(player.getPayingWith() == null) {
+			return new ResponseEntity<PayOption>(standardProjectHandler.checkStandardProjectEffect(projectName, player), HttpStatus.OK);
+		}
+		standardProjectHandler.standardProject(projectName, player);
+		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
+		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		return new ResponseEntity<PayOption>(HttpStatus.OK);
+	}
 	
 	//SSE
 	

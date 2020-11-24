@@ -13,4 +13,5 @@ public enum Resource {
 	ENERGY_PROD,
 	HEAT,
 	HEAT_PROD,
+	CARD
 }

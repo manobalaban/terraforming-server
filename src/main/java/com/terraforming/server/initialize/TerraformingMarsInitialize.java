@@ -5,8 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.terraforming.server.model.Colony;
+import com.terraforming.server.model.Party;
 import com.terraforming.server.model.Player;
 
 public class TerraformingMarsInitialize {
@@ -55,5 +58,40 @@ public class TerraformingMarsInitialize {
 			awards.put(names.get(i), false);
 		}
 		return awards;
+	}
+	
+	public static Map<String, Colony> initColonies(int numberOfPLayers) {
+		Map<String, Colony> colonies = new HashMap<String, Colony>();
+		List<String> names = new CopyOnWriteArrayList<String>(Arrays.asList(
+				"callisto", "ceres", "encaladus", "europa", "ganymede",
+				"io", "luna", "miranda", "pluto", "titan",
+				"triton"));
+		Collections.shuffle(names);
+		for(int i = 0; i < numberOfPLayers + 2; i++) {
+			if(names.get(i).equals("encaladus") || names.get(i).equals("miranda") || names.get(i).equals("titan")) {
+				colonies.put(names.get(i), new Colony(names.get(i), false));
+			} else {
+				colonies.put(names.get(i), new Colony(names.get(i), true));
+			}
+		}
+		return colonies;
+	}
+	
+	public static Map<String, Party> initTurmoil() {
+		Map<String, Party> parties = new HashMap<String, Party>();
+		List<String> names = new CopyOnWriteArrayList<String>(Arrays.asList(
+				"greens", "kalvinists", "mars_first", "reds", "scientists", "unity"));
+		Collections.shuffle(names);
+		boolean active = true;
+		for(String name : names) {
+			Party party = new Party(name);
+			if(active) {
+				party.setActive(true);
+				active = false;
+			}
+			party.setPartyBonus(new Random().nextInt(2) + 1);
+			party.setPartyEffect(new Random().nextInt(4) + 1);
+		}
+		return parties;
 	}
 }

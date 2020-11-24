@@ -10,6 +10,7 @@ public class CardEffect {
 	private String id;
 	private boolean triggeredByEveryne = false;
 	private List<EffectType> types = new CopyOnWriteArrayList<EffectType>();
+	private String owner;
 	
 	public CardEffect() {}
 	
@@ -33,5 +34,13 @@ public class CardEffect {
 
 	public boolean isTriggeredByEveryne() {
 		return triggeredByEveryne;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 }

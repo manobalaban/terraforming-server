@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.terraforming.server.aplication.CardsHandler;
 import com.terraforming.server.constans.Resource;
 import com.terraforming.server.constans.Tag;
 
@@ -19,7 +20,7 @@ public class Player {
 	
 	private int tr = 20;
 	private Map<Resource, Integer> resources;
-	private Map<Resource, Integer> payingWith = new HashMap<Resource, Integer>();
+	private Map<Resource, Integer> payingWith = new HashMap<>();
 	
 	private List<String> drawnCards = new CopyOnWriteArrayList<>();
 	private List<String> cardsToBuy = new CopyOnWriteArrayList<>();
@@ -28,10 +29,14 @@ public class Player {
 	private String corporation;
 	private List<String> corporationsToChose = new CopyOnWriteArrayList<>();
 	
-	private List<CardAction> actions = new CopyOnWriteArrayList<CardAction>(); 
-	private List<CardEffect> effects = new CopyOnWriteArrayList<CardEffect>(); 
-	private List<OnCardCollected> collections = new CopyOnWriteArrayList<OnCardCollected>(); 
+	private Map<String, CardAction> actions = new HashMap<String, CardAction>();
+	private Map<String, CardEffect> effects = new HashMap<>();
+	private Map<String, OnCardCollected> collections = new HashMap<>();
 	private List<Tag> tags = new CopyOnWriteArrayList<Tag>();
+	
+	private int fleet = 1;
+	private int availableFleet = 1;
+	private boolean usingFreeDelegate = false;
 	
 	public Player() {
 		resources = new HashMap<>(Map.of(Resource.CREDIT, 0, Resource.CREDIT_PROD, 0, Resource.STEEL, 0, Resource.STEEL_PROD, 0, Resource.TITAN, 0, Resource.TITAN_PROD, 0, Resource.PLANT, 0, Resource.PLANT_PROD, 0, Resource.ENERGY, 0, Resource.ENERGY_PROD, 0));
@@ -85,11 +90,39 @@ public class Player {
 	}
 
 	public void setResources(Map<Resource, Integer> resources) {
-		this.resources = resources;
+		for(Map.Entry<Resource, Integer> actualEntry : resources.entrySet()) {
+			for(Map.Entry<Resource, Integer> entry : this.resources.entrySet()) {
+				if(actualEntry.getKey() == entry.getKey() && entry.getKey() != Resource.CARD) {
+					this.resources.put(entry.getKey(), entry.getValue() + actualEntry.getValue());
+				} else if(actualEntry.getKey() == entry.getKey() && entry.getKey() == Resource.CARD) {
+					cardsInHand.addAll(CardsHandler.getCardsFromDeck(actualEntry.getValue()));
+				}
+			}
+		}
+	}
+	
+	public boolean setResourcesIntention(Map<Resource, Integer> resources) {
+		boolean possible = true;
+		for(Map.Entry<Resource, Integer> entry : this.resources.entrySet()) {
+			for(Map.Entry<Resource, Integer> newEntry : resources.entrySet()) {
+				if(entry.getKey() == newEntry.getKey()) {
+					if(entry.getKey() == Resource.CREDIT_PROD && entry.getValue() - newEntry.getValue() < -5) {
+						possible = false;
+					} else if(entry.getKey() != Resource.CREDIT_PROD && entry.getValue() - newEntry.getValue() < 0) {
+						possible = false;
+					}
+				}
+			}
+		}
+		return possible;
 	}
 
 	public Map<Resource, Integer> getPayingWith() {
-		return payingWith;
+		Map<Resource, Integer> result = new HashMap<Resource, Integer>();
+		for(Map.Entry<Resource, Integer> entry : payingWith.entrySet()) {
+			result.put(entry.getKey(), entry.getValue() * -1);
+		}
+		return result;
 	}
 
 	public void setPayingWith(Map<Resource, Integer> payingWith) {
@@ -122,6 +155,17 @@ public class Player {
 	
 	public void addCardsToHand(List<String> cards) {
 		this.cardsInHand.addAll(cards);
+	}
+	
+	public String pullCardFromHand(String card) {
+		int cardIndex = 0;
+		for(int i = 0; i < cardsInHand.size(); i++) {
+			if(cardsInHand.get(i).equals(card)) {
+				cardIndex = i;
+			}
+		}
+		cardsInHand.remove(cardIndex);
+		return null;
 	}
 
 	public List<String> getPlayedCards() {
@@ -156,28 +200,37 @@ public class Player {
 		this.corporationsToChose = corporationsToChose;
 	}
 
-	public List<CardAction> getActions() {
+	public Map<String, CardAction> getActions() {
 		return actions;
 	}
 
-	public List<CardEffect> getEffects() {
+	public Map<String, CardEffect> getEffects() {
 		return effects;
 	}
 
-	public List<OnCardCollected> getCollections() {
+	public Map<String, OnCardCollected> getCollections() {
 		return collections;
 	}
 	
 	public void addToActions(CardAction action) {
-		actions.add(action);
+		if(action != null) {
+			action.setOwner(name);
+			actions.put(action.getId(), action);
+		}
 	}
 	
 	public void addToEffects(CardEffect effect) {
-		effects.add(effect);
+		if(effect != null) {
+			effect.setOwner(name);
+			effects.put(effect.getId(), effect);
+		}
 	}
 	
 	public void addToCollections(OnCardCollected collection) {
-		collections.add(collection);
+		if(collection != null) {
+			collection.setOwner(name);
+			collections.put(collection.getId(), collection);
+		}
 	}
 
 	public List<Tag> getTags() {
@@ -196,4 +249,28 @@ public class Player {
 		this.firstActionDone = firstActionDone;
 	}
 
+	public int getFleet() {
+		return fleet;
+	}
+
+	public void setFleet(int fleet) {
+		this.fleet = fleet;
+	}
+
+	public int getAvailableFleet() {
+		return availableFleet;
+	}
+
+	public void setAvailableFleet(int availableFleet) {
+		this.availableFleet = availableFleet;
+	}
+
+	public boolean isUsingFreeDelegate() {
+		return usingFreeDelegate;
+	}
+
+	public void setUsingFreeDelegate(boolean usingFreeDelegate) {
+		this.usingFreeDelegate = usingFreeDelegate;
+	}
+	
 }

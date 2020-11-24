@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.terraforming.server.initialize.TerraformingMarsInitialize;
+import com.terraforming.server.model.PayOption;
 import com.terraforming.server.model.Player;
 
 public class AwardsHandler {
@@ -27,18 +28,23 @@ public class AwardsHandler {
 	}
 	
 	public void setAward(String name, Player actualPlayer) {
-		playersHandler.pay(actualPlayer);
+		playersHandler.getPlayer(actualPlayer.getName()).setResources(actualPlayer.getPayingWith());
+		playersHandler.getPlayer(actualPlayer.getName()).setPayingWith(null);
 		awards.put(name, true);
 	}
 	
-	public int checkAwards() {
+	public PayOption checkPayForAward(Player actualPlayer) {
 		int establishedAwards = 0;
 		for(Map.Entry<String, Boolean> entry : awards.entrySet()) {
 			if(entry.getValue() == true) {
 				establishedAwards ++;
 			}
 		}
-		return 8 + (establishedAwards * 2);
+		int price = 8 + (establishedAwards * 2);
+		if(price > 20) {
+			return new PayOption(false);
+		}
+		return TerraformingMarsHandler.checkPayIntention(actualPlayer, price);
 	}
 
 }
