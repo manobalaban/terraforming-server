@@ -33,9 +33,9 @@ public class TerraformingMarsHandler {
 		gameData.setFreeDelegates(TurmoilHandler.getInstance().getFreeDelegates());
 		gameData.setDelegates(TurmoilHandler.getInstance().getDelegates());
 		gameData.setDominantParty(TurmoilHandler.getInstance().getDominantParty());
-		return null;
+		return gameData;
 	}
-
+	
 	public static List<CardEffect> getTriggeredEffects(EffectType type, String actualPlayerName) {
 		List<CardEffect> result = new CopyOnWriteArrayList<CardEffect>();
 		for(Player player : playersHandler.getPlayers()) {

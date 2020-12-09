@@ -8,6 +8,7 @@ import com.terraforming.server.constans.TileType;
 import com.terraforming.server.effect.EffectSorter;
 import com.terraforming.server.initialize.MarsTilesInitializer;
 import com.terraforming.server.model.PayOption;
+import com.terraforming.server.model.PayWith;
 import com.terraforming.server.model.Player;
 import com.terraforming.server.model.Tile;
 
@@ -47,15 +48,15 @@ public class TileHandler {
 	
 	public void planting(String coordinate, Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		player.setResources(actualPlayer.getPayingWith());
-		player.setPayingWith(null);
+		player.setPayWithResources(actualPlayer.getPayingWith());
+		player.setPayingWith(new PayWith());
 		TerraformingMarsHandler.getTriggeredEffects(EffectType.PLACE_TILE, actualPlayer.getName()).forEach(effect -> EffectSorter.onPlaceTileEffect(effect.getId()));
 		Tile tile = tiles.get(coordinate);
 		tile.setOwner(player.getName());
 		tile.setType(TileType.FOREST);
 		globalParameterHandler.increaseOxygen(true, player);
 		for(Resource resource : tile.getBonus()) {
-			player.setResources(Map.of(resource, 1));
+			player.setPayWithResources(new PayWith(Map.of(resource, 1)));
 		}
 	}
 }

@@ -6,6 +6,7 @@ import com.terraforming.server.constans.EffectType;
 import com.terraforming.server.constans.Resource;
 import com.terraforming.server.effect.EffectSorter;
 import com.terraforming.server.model.PayOption;
+import com.terraforming.server.model.PayWith;
 import com.terraforming.server.model.Player;
 
 public class GlobalParameterHandler {
@@ -64,7 +65,7 @@ public class GlobalParameterHandler {
 		if(increase && temperature < 9) {
 			temperature++;
 			if(temperature == -24 || temperature == -20) {
-				player.setResources(Map.of(Resource.HEAT_PROD, 1));
+				player.setPayWithResources(new PayWith(Map.of(Resource.HEAT_PROD, 1)));
 			}
 			if(temperature == 0) {
 				increaseOceans(true, player);

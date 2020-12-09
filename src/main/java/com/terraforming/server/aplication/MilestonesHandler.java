@@ -9,11 +9,12 @@ import com.terraforming.server.constans.Resource;
 import com.terraforming.server.constans.Tag;
 import com.terraforming.server.initialize.TerraformingMarsInitialize;
 import com.terraforming.server.model.PayOption;
+import com.terraforming.server.model.PayWith;
 import com.terraforming.server.model.Player;
 
 public class MilestonesHandler {
 	private static MilestonesHandler instance = null;
-	private static Map<String, Player> milestones = new HashMap<String, Player>();
+	private static Map<String, String> milestones = new HashMap<String, String>();
 	private static PlayersHandler playersHandler = PlayersHandler.getInstance();
 	
 	private MilestonesHandler() {}
@@ -26,25 +27,25 @@ public class MilestonesHandler {
 		return instance;
 	}
 	
-	public Map<String, Player> getMilestones() {
+	public Map<String, String> getMilestones() {
 		return milestones;
 	}
 	
 	public void setMilestone(String milestone, Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		player.setResources(actualPlayer.getPayingWith());
-		player.setPayingWith(null);
-		milestones.put(milestone, player);
+		player.setPayWithResources(actualPlayer.getPayingWith());
+		player.setPayingWith(new PayWith());
+		milestones.put(milestone, player.getName());
 	}
 	
 	public PayOption checkPayForMilestone(String milestone, Player actualPlayer) {
 		int achievedMilestones = 0;
-		for(Map.Entry<String, Player> stone : milestones.entrySet()) {
+		for(Map.Entry<String, String> stone : milestones.entrySet()) {
 			if(stone.getValue() != null) {
 				achievedMilestones ++;
 			}
 		}
-		boolean milestoneAvailable = achievedMilestones < 7 ? checkMilestones(milestone, actualPlayer) : false;
+		boolean milestoneAvailable = achievedMilestones < 3 ? checkMilestones(milestone, actualPlayer) : false;
 		int price = 8;
 		if(!milestoneAvailable) {
 			return new PayOption(false);

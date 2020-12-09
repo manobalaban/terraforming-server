@@ -14,7 +14,7 @@ public class GameData {
 	private double oxygen;
 	private int venus;
 	
-	private Map<String, Player> milestones;
+	private Map<String, String> milestones;
 	private Map<String, Boolean> awards;
 	private Map<String, Colony> colonies;
 	
@@ -59,10 +59,10 @@ public class GameData {
 	public void setVenus(int venus) {
 		this.venus = venus;
 	}
-	public Map<String, Player> getMilestones() {
+	public Map<String, String> getMilestones() {
 		return milestones;
 	}
-	public void setMilestones(Map<String, Player> milestones) {
+	public void setMilestones(Map<String, String> milestones) {
 		this.milestones = milestones;
 	}
 	public Map<String, Boolean> getAwards() {

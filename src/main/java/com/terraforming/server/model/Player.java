@@ -20,7 +20,7 @@ public class Player {
 	
 	private int tr = 20;
 	private Map<Resource, Integer> resources;
-	private Map<Resource, Integer> payingWith = new HashMap<>();
+	private PayWith payingWith = new PayWith();
 	
 	private List<String> drawnCards = new CopyOnWriteArrayList<>();
 	private List<String> cardsToBuy = new CopyOnWriteArrayList<>();
@@ -89,8 +89,8 @@ public class Player {
 		return resources;
 	}
 
-	public void setResources(Map<Resource, Integer> resources) {
-		for(Map.Entry<Resource, Integer> actualEntry : resources.entrySet()) {
+	public void setPayWithResources(PayWith payWith) {
+		for(Map.Entry<Resource, Integer> actualEntry : payWith.getResources().entrySet()) {
 			for(Map.Entry<Resource, Integer> entry : this.resources.entrySet()) {
 				if(actualEntry.getKey() == entry.getKey() && entry.getKey() != Resource.CARD) {
 					this.resources.put(entry.getKey(), entry.getValue() + actualEntry.getValue());
@@ -99,12 +99,19 @@ public class Player {
 				}
 			}
 		}
+		for(Map.Entry<String, Integer> actualEntry : payWith.getCollections().entrySet()) {
+			for(Map.Entry<String, OnCardCollected> entry : this.collections.entrySet()) {
+				if(actualEntry.getKey().equals(entry.getKey())) {
+					this.collections.put(actualEntry.getKey(), this.collections.get(entry.getKey()).addToQuantity(actualEntry.getValue()));
+				}
+			}
+		}
 	}
 	
-	public boolean setResourcesIntention(Map<Resource, Integer> resources) {
+	public boolean checkPayWithIntention(PayWith payWith) {
 		boolean possible = true;
 		for(Map.Entry<Resource, Integer> entry : this.resources.entrySet()) {
-			for(Map.Entry<Resource, Integer> newEntry : resources.entrySet()) {
+			for(Map.Entry<Resource, Integer> newEntry : payWith.getResources().entrySet()) {
 				if(entry.getKey() == newEntry.getKey()) {
 					if(entry.getKey() == Resource.CREDIT_PROD && entry.getValue() - newEntry.getValue() < -5) {
 						possible = false;
@@ -114,18 +121,31 @@ public class Player {
 				}
 			}
 		}
+		for(Map.Entry<String, OnCardCollected> entry : this.collections.entrySet()) {
+			for(Map.Entry<String, Integer> newEntry : payWith.getCollections().entrySet()) {
+				if(entry.getKey().equals(newEntry.getKey())) {
+					if(entry.getValue().getQuantity() - newEntry.getValue() < 0) {
+						possible = false;
+					}
+				}
+			}
+		}
 		return possible;
 	}
 
-	public Map<Resource, Integer> getPayingWith() {
-		Map<Resource, Integer> result = new HashMap<Resource, Integer>();
-		for(Map.Entry<Resource, Integer> entry : payingWith.entrySet()) {
-			result.put(entry.getKey(), entry.getValue() * -1);
+	public PayWith getPayingWith() {
+		Map<Resource, Integer> resources = new HashMap<Resource, Integer>();
+		for(Map.Entry<Resource, Integer> entry : payingWith.getResources().entrySet()) {
+			resources.put(entry.getKey(), entry.getValue() * -1);
 		}
-		return result;
+		Map<String, Integer> collections = new HashMap<String, Integer>();
+		for(Map.Entry<String, Integer> entry : payingWith.getCollections().entrySet()) {
+			collections.put(entry.getKey(), entry.getValue() * -1);
+		}
+		return new PayWith(resources, collections);
 	}
 
-	public void setPayingWith(Map<Resource, Integer> payingWith) {
+	public void setPayingWith(PayWith payingWith) {
 		this.payingWith = payingWith;
 	}
 
@@ -272,5 +292,31 @@ public class Player {
 	public void setUsingFreeDelegate(boolean usingFreeDelegate) {
 		this.usingFreeDelegate = usingFreeDelegate;
 	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setTr(int tr) {
+		this.tr = tr;
+	}
+
+	public void setActions(Map<String, CardAction> actions) {
+		this.actions = actions;
+	}
+
+	public void setEffects(Map<String, CardEffect> effects) {
+		this.effects = effects;
+	}
+
+	public void setCollections(Map<String, OnCardCollected> collections) {
+		this.collections = collections;
+	}
+
+	public void setTags(List<Tag> tags) {
+		this.tags = tags;
+	}
+	
+	
 	
 }

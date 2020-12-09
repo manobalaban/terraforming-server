@@ -17,14 +17,14 @@ public class EffectSorter {
 		}
 	}
 	
-	public static void onCardBuyEffect(String effectId, int cardPrice) {
-		cardPrice = 3;
+	public static void onCardBuyEffect(String effectId, PayOption payOption) {
+		//cardPrice = 3;
 		switch (effectId) {
 		case "c25":
-			cardPrice = CorporationEffects.c25();
+			payOption.setPrice(CorporationEffects.c25());
 			break;
 		case "c31":
-			cardPrice = CorporationEffects.c31();
+			payOption.setPrice(CorporationEffects.c31());
 			break;
 		}
 	}

@@ -7,9 +7,9 @@ public class Colony {
 	
 	private String name;
 	private boolean active;
-	private List<Player> playersOnColony = new CopyOnWriteArrayList<Player>();
+	private List<String> playersOnColony = new CopyOnWriteArrayList<String>();
 	private int colonyLevel;
-	private Player traded = null;
+	private String traded = "";
 	
 	public Colony(String name, boolean active) {
 		this.name = name;
@@ -33,11 +33,11 @@ public class Colony {
 		colonyLevel = 2;
 	}
 
-	public List<Player> getPlayersOnColony() {
+	public List<String> getPlayersOnColony() {
 		return playersOnColony;
 	}
 	
-	public void addPlayerToColony(Player player) {
+	public void addPlayerToColony(String player) {
 		playersOnColony.add(player);
 	}
 	
@@ -55,17 +55,17 @@ public class Colony {
 		}
 	}
 	
-	public void trade(Player player) {
+	public void trade(String player) {
 		traded = player;
 		colonyLevel = 1 + playersOnColony.size();
 	}
 
-	public Player getTraded() {
+	public String getTraded() {
 		return traded;
 	}
 	
 	public void clearTraded() {
-		traded = null;
+		traded = "";
 	}
 	
 }

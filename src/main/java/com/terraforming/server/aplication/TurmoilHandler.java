@@ -10,6 +10,7 @@ import com.terraforming.server.effect.EffectSorter;
 import com.terraforming.server.initialize.TerraformingMarsInitialize;
 import com.terraforming.server.model.Party;
 import com.terraforming.server.model.PayOption;
+import com.terraforming.server.model.PayWith;
 import com.terraforming.server.model.Player;
 
 public class TurmoilHandler {
@@ -73,8 +74,8 @@ public class TurmoilHandler {
 	
 	public void buyDelegate(String partyName, Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		player.setResources(actualPlayer.getPayingWith());
-		player.setPayingWith(null);
+		player.setPayWithResources(actualPlayer.getPayingWith());
+		player.setPayingWith(new PayWith());
 		Party party = parties.get(partyName);
 		party.addDelegate(player);
 		if(party.getNumberOfDelegates() > parties.get(dominantParty).getNumberOfDelegates()) {

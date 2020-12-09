@@ -7,6 +7,7 @@ import com.terraforming.server.constans.EffectType;
 import com.terraforming.server.constans.Resource;
 import com.terraforming.server.effect.EffectSorter;
 import com.terraforming.server.model.PayOption;
+import com.terraforming.server.model.PayWith;
 import com.terraforming.server.model.Player;
 
 public class StandardProjectHandler {
@@ -57,14 +58,14 @@ public class StandardProjectHandler {
 	
 	public void standardProject(String projectName, Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		player.setResources(actualPlayer.getPayingWith());
-		player.setPayingWith(null);
+		player.setPayWithResources(actualPlayer.getPayingWith());
+		player.setPayingWith(new PayWith());
 		switch (projectName) {
 		case "sell_patents":
 			sellPatients(actualPlayer);
 			break;
 		case "powerPlant":
-			player.setResources(Map.of(Resource.ENERGY_PROD, 1));
+			player.setPayWithResources(new PayWith(Map.of(Resource.ENERGY_PROD, 1)));
 			TerraformingMarsHandler.getTriggeredEffects(EffectType.CHANGE_PRODUCTION, actualPlayer.getName()).forEach(effect -> EffectSorter.onChangeProduction(effect.getId(), player));
 			break;
 		case "asteroid":
@@ -78,7 +79,7 @@ public class StandardProjectHandler {
 			//TODO SSE
 			break;
 		case "city":
-			player.setResources(Map.of(Resource.CREDIT_PROD, 1));
+			player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT_PROD, 1)));
 			TerraformingMarsHandler.getTriggeredEffects(EffectType.CHANGE_PRODUCTION, actualPlayer.getName()).forEach(effect -> EffectSorter.onChangeProduction(effect.getId(), player));
 			//TODO SSE
 			break;
@@ -93,7 +94,7 @@ public class StandardProjectHandler {
 	
 	private void sellPatients(Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		player.setResources(Map.of(Resource.CREDIT, actualPlayer.getDrawnCards().size()));
+		player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT, actualPlayer.getDrawnCards().size())));
 		for(String cardId : actualPlayer.getDrawnCards()) {
 			cardsHandler.burnCard(cardId);
 			player.pullCardFromHand(cardId);

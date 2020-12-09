@@ -8,7 +8,7 @@ public enum Tag {
 	MICROBE,
 	ANIMAL,
 	ENERGY,
-	JUVIAN,
+	JOVIAN,
 	EARTH,
 	CITY,
 	EVENT,

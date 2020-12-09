@@ -10,9 +10,11 @@ import com.terraforming.server.constans.CardResource;
 import com.terraforming.server.constans.EffectType;
 import com.terraforming.server.constans.Resource;
 import com.terraforming.server.effect.EffectSorter;
+import com.terraforming.server.initialize.CorporationsInitializer;
 import com.terraforming.server.initialize.TerraformingMarsInitialize;
 import com.terraforming.server.model.Corporation;
 import com.terraforming.server.model.PayOption;
+import com.terraforming.server.model.PayWith;
 import com.terraforming.server.model.Player;
 
 public class CardsHandler {
@@ -32,6 +34,7 @@ public class CardsHandler {
 		if(instance == null) {
 			cardDeck = TerraformingMarsInitialize.initCards(345, "");
 			corporations = TerraformingMarsInitialize.initCards(38, "c");
+			corporationCards = CorporationsInitializer.initCorporations();
 			instance = new CardsHandler();
 		}
 		return instance;
@@ -119,7 +122,7 @@ public class CardsHandler {
 		Corporation corp = getCorporation(activePlayer.getCorporation());
 		Player player = playersHandler.getPlayer(activePlayer.getName());
 		playersHandler.nextPlayer();
-		player.setCorporation(activePlayer.getCorporation());
+		player.setCorporation(corp.getId());
 		player.AddTags(corp.getTags());
 		player.getResources().putAll(corp.getResources());
 		player.addToEffects(corp.getEffect());
@@ -156,9 +159,9 @@ public class CardsHandler {
 	}
 	
 	public PayOption checkPayForResearchEffect(Player player) {
-		int cardPrice = 3;
-		TerraformingMarsHandler.getTriggeredEffects(EffectType.RESEARCH_PRICE, player.getName()).forEach(effect -> EffectSorter.onCardBuyEffect(effect.getId(), cardPrice));
-		int price = player.getCardsToBuy().size() * cardPrice;
+		PayOption payOption = new PayOption(true, 3);
+		TerraformingMarsHandler.getTriggeredEffects(EffectType.RESEARCH_PRICE, player.getName()).forEach(effect -> EffectSorter.onCardBuyEffect(effect.getId(), payOption));
+		int price = player.getCardsToBuy().size() * payOption.getPrice();
 		return TerraformingMarsHandler.checkPayIntention(player, price);
 	}
 	
@@ -166,7 +169,7 @@ public class CardsHandler {
 		boolean everyBodyReady = true;
 		playersHandler.nextPlayer();
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		player.setResources(actualPlayer.getPayingWith());
+		player.setPayWithResources(actualPlayer.getPayingWith());
 		player.addCardsToHand(actualPlayer.getCardsToBuy());
 		for(String cardId : actualPlayer.getDrawnCards()) {
 			if(!player.getCardsInHand().contains(cardId)) {
@@ -175,7 +178,7 @@ public class CardsHandler {
 		}
 		player.setDrawnCards(new CopyOnWriteArrayList<String>());
 		player.setCardsToBuy(new CopyOnWriteArrayList<String>());
-		player.setPayingWith(null);
+		player.setPayingWith(new PayWith());
 		player.setReady(true);
 		for(Player playerReady : playersHandler.getPlayers()) {
 			if(!playerReady.isReady() && !playerReady.getName().equals("admin")) {

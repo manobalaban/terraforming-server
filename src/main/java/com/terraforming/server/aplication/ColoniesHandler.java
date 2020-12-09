@@ -12,6 +12,7 @@ import com.terraforming.server.effect.EffectSorter;
 import com.terraforming.server.initialize.TerraformingMarsInitialize;
 import com.terraforming.server.model.Colony;
 import com.terraforming.server.model.PayOption;
+import com.terraforming.server.model.PayWith;
 import com.terraforming.server.model.Player;
 
 public class ColoniesHandler {
@@ -59,10 +60,10 @@ public class ColoniesHandler {
 		PayOption payOption = TerraformingMarsHandler.checkPayIntention(actualPlayer, 9);
 		payOption.putResourcesWithValue(Map.of(Resource.CREDIT, 1));
 		result.add(payOption);
-		payOption = new PayOption(player.setResourcesIntention(Map.of(Resource.ENERGY, 3)), 3);
+		payOption = new PayOption(player.checkPayWithIntention(new PayWith(Map.of(Resource.ENERGY, 3), new HashMap<String, Integer>())), 3);
 		payOption.putResourcesWithValue(Map.of(Resource.ENERGY, 1));
 		result.add(payOption);
-		payOption = new PayOption(player.setResourcesIntention(Map.of(Resource.TITAN, 3)), 3);
+		payOption = new PayOption(player.checkPayWithIntention(new PayWith(Map.of(Resource.TITAN, 3), new HashMap<String, Integer>())), 3);
 		payOption.putResourcesWithValue(Map.of(Resource.TITAN, 1));
 		result.add(payOption);
 
@@ -71,7 +72,7 @@ public class ColoniesHandler {
 
 		Colony colony = getColony(colonyName);
 
-		if (player.getAvailableFleet() == 0 || colony.getTraded() == null || !colony.isActive()) {
+		if (player.getAvailableFleet() == 0 || !colony.getTraded().equals("") || !colony.isActive()) {
 			for (PayOption actualOption : result) {
 				actualOption.setPossible(false);
 			}
@@ -81,8 +82,8 @@ public class ColoniesHandler {
 
 	public void trade(Player actualPlayer, String colonyName) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		player.setResources(actualPlayer.getPayingWith());
-		player.setPayingWith(null);
+		player.setPayWithResources(actualPlayer.getPayingWith());
+		player.setPayingWith(new PayWith());
 		player.setAvailableFleet(player.getAvailableFleet() - 1);
 		switch (colonyName) {
 		case "callisto":
@@ -125,207 +126,207 @@ public class ColoniesHandler {
 		Colony colony = getColony("callisto");
 		switch (colony.getColonyLevel()) {
 		case 2:
-			player.setResources(Map.of(Resource.ENERGY, 2));
+			player.setPayWithResources(new PayWith(Map.of(Resource.ENERGY, 2)));
 			break;
 		case 3:
-			player.setResources(Map.of(Resource.ENERGY, 3));
+			player.setPayWithResources(new PayWith(Map.of(Resource.ENERGY, 3)));
 			break;
 		case 4:
-			player.setResources(Map.of(Resource.ENERGY, 5));
+			player.setPayWithResources(new PayWith(Map.of(Resource.ENERGY, 5)));
 			break;
 		case 5:
-			player.setResources(Map.of(Resource.ENERGY, 7));
+			player.setPayWithResources(new PayWith(Map.of(Resource.ENERGY, 7)));
 			break;
 		case 6:
-			player.setResources(Map.of(Resource.ENERGY, 10));
+			player.setPayWithResources(new PayWith(Map.of(Resource.ENERGY, 10)));
 			break;
 		case 7:
-			player.setResources(Map.of(Resource.ENERGY, 13));
+			player.setPayWithResources(new PayWith(Map.of(Resource.ENERGY, 13)));
 			break;
 		}
-		for (Player playerOnColony : colony.getPlayersOnColony()) {
-			playersHandler.getPlayer(playerOnColony.getName()).setResources(Map.of(Resource.ENERGY, 3));
+		for (String playerOnColony : colony.getPlayersOnColony()) {
+			playersHandler.getPlayer(playerOnColony).setPayWithResources(new PayWith(Map.of(Resource.ENERGY, 3)));
 		}
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void ceres(Player player) {
 		Colony colony = getColony("ceres");
 		switch (colony.getColonyLevel()) {
 		case 1:
-			player.setResources(Map.of(Resource.STEEL, 1));
+			player.setPayWithResources(new PayWith(Map.of(Resource.STEEL, 1)));
 			break;
 		case 2:
-			player.setResources(Map.of(Resource.STEEL, 2));
+			player.setPayWithResources(new PayWith(Map.of(Resource.STEEL, 2)));
 			break;
 		case 3:
-			player.setResources(Map.of(Resource.STEEL, 3));
+			player.setPayWithResources(new PayWith(Map.of(Resource.STEEL, 3)));
 			break;
 		case 4:
-			player.setResources(Map.of(Resource.STEEL, 4));
+			player.setPayWithResources(new PayWith(Map.of(Resource.STEEL, 4)));
 			break;
 		case 5:
-			player.setResources(Map.of(Resource.STEEL, 6));
+			player.setPayWithResources(new PayWith(Map.of(Resource.STEEL, 6)));
 			break;
 		case 6:
-			player.setResources(Map.of(Resource.STEEL, 8));
+			player.setPayWithResources(new PayWith(Map.of(Resource.STEEL, 8)));
 			break;
 		case 7:
-			player.setResources(Map.of(Resource.STEEL, 10));
+			player.setPayWithResources(new PayWith(Map.of(Resource.STEEL, 10)));
 			break;
 		}
-		for (Player playerOnColony : colony.getPlayersOnColony()) {
-			playersHandler.getPlayer(playerOnColony.getName()).setResources(Map.of(Resource.STEEL, 2));
+		for (String playerOnColony : colony.getPlayersOnColony()) {
+			playersHandler.getPlayer(playerOnColony).setPayWithResources(new PayWith(Map.of(Resource.STEEL, 2)));
 		}
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void encaladus(Player player) {
 		Colony colony = getColony("encaladus");
 		//TODO SSE
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void europa(Player player) {
 		Colony colony = getColony("europa");
 		//TODO SSE
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void ganymede(Player player) {
 		Colony colony = getColony("ganymede");
 		switch (colony.getColonyLevel()) {
 		case 2:
-			player.setResources(Map.of(Resource.PLANT, 1));
+			player.setPayWithResources(new PayWith(Map.of(Resource.PLANT, 1)));
 			break;
 		case 3:
-			player.setResources(Map.of(Resource.PLANT, 2));
+			player.setPayWithResources(new PayWith(Map.of(Resource.PLANT, 2)));
 			break;
 		case 4:
-			player.setResources(Map.of(Resource.PLANT, 3));
+			player.setPayWithResources(new PayWith(Map.of(Resource.PLANT, 3)));
 			break;
 		case 5:
-			player.setResources(Map.of(Resource.PLANT, 4));
+			player.setPayWithResources(new PayWith(Map.of(Resource.PLANT, 4)));
 			break;
 		case 6:
-			player.setResources(Map.of(Resource.PLANT, 5));
+			player.setPayWithResources(new PayWith(Map.of(Resource.PLANT, 5)));
 			break;
 		case 7:
-			player.setResources(Map.of(Resource.PLANT, 6));
+			player.setPayWithResources(new PayWith(Map.of(Resource.PLANT, 6)));
 			break;
 		}
-		for (Player playerOnColony : colony.getPlayersOnColony()) {
-			playersHandler.getPlayer(playerOnColony.getName()).setResources(Map.of(Resource.PLANT, 1));
+		for (String playerOnColony : colony.getPlayersOnColony()) {
+			playersHandler.getPlayer(playerOnColony).setPayWithResources(new PayWith(Map.of(Resource.PLANT, 1)));
 		}
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void io(Player player) {
 		Colony colony = getColony("io");
 		switch (colony.getColonyLevel()) {
 		case 1:
-			player.setResources(Map.of(Resource.HEAT, 2));
+			player.setPayWithResources(new PayWith(Map.of(Resource.HEAT, 2)));
 			break;
 		case 2:
-			player.setResources(Map.of(Resource.HEAT, 3));
+			player.setPayWithResources(new PayWith(Map.of(Resource.HEAT, 3)));
 			break;
 		case 3:
-			player.setResources(Map.of(Resource.HEAT, 4));
+			player.setPayWithResources(new PayWith(Map.of(Resource.HEAT, 4)));
 			break;
 		case 4:
-			player.setResources(Map.of(Resource.HEAT, 6));
+			player.setPayWithResources(new PayWith(Map.of(Resource.HEAT, 6)));
 			break;
 		case 5:
-			player.setResources(Map.of(Resource.HEAT, 8));
+			player.setPayWithResources(new PayWith(Map.of(Resource.HEAT, 8)));
 			break;
 		case 6:
-			player.setResources(Map.of(Resource.HEAT, 10));
+			player.setPayWithResources(new PayWith(Map.of(Resource.HEAT, 10)));
 			break;
 		case 7:
-			player.setResources(Map.of(Resource.HEAT, 13));
+			player.setPayWithResources(new PayWith(Map.of(Resource.HEAT, 13)));
 			break;
 		}
-		for (Player playerOnColony : colony.getPlayersOnColony()) {
-			playersHandler.getPlayer(playerOnColony.getName()).setResources(Map.of(Resource.HEAT, 2));
+		for (String playerOnColony : colony.getPlayersOnColony()) {
+			playersHandler.getPlayer(playerOnColony).setPayWithResources(new PayWith(Map.of(Resource.HEAT, 2)));
 		}
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void luna(Player player) {
 		Colony colony = getColony("luna");
 		switch (colony.getColonyLevel()) {
 		case 1:
-			player.setResources(Map.of(Resource.CREDIT, 1));
+			player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT, 1)));
 			break;
 		case 2:
-			player.setResources(Map.of(Resource.CREDIT, 2));
+			player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT, 2)));
 			break;
 		case 3:
-			player.setResources(Map.of(Resource.CREDIT, 4));
+			player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT, 4)));
 			break;
 		case 4:
-			player.setResources(Map.of(Resource.CREDIT, 7));
+			player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT, 7)));
 			break;
 		case 5:
-			player.setResources(Map.of(Resource.CREDIT, 10));
+			player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT, 10)));
 			break;
 		case 6:
-			player.setResources(Map.of(Resource.CREDIT, 13));
+			player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT, 13)));
 			break;
 		case 7:
-			player.setResources(Map.of(Resource.CREDIT, 17));
+			player.setPayWithResources(new PayWith(Map.of(Resource.CREDIT, 17)));
 			break;
 		}
-		for (Player playerOnColony : colony.getPlayersOnColony()) {
-			playersHandler.getPlayer(playerOnColony.getName()).setResources(Map.of(Resource.CREDIT, 2));
+		for (String playerOnColony : colony.getPlayersOnColony()) {
+			playersHandler.getPlayer(playerOnColony).setPayWithResources(new PayWith(Map.of(Resource.CREDIT, 2)));
 		}
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void miranda(Player player) {
 		Colony colony = getColony("miranda");
 		//TODO SSE
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void pluto(Player player) {
 		Colony colony = getColony("pluto");
 		//TODO SSE
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void titan(Player player) {
 		Colony colony = getColony("titan");
 		//TODO SSE
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 	private void triton(Player player) {
 		Colony colony = getColony("triton");
 		switch (colony.getColonyLevel()) {
 		case 2:
-			player.setResources(Map.of(Resource.TITAN, 1));
+			player.setPayWithResources(new PayWith(Map.of(Resource.TITAN, 1)));
 			break;
 		case 3:
-			player.setResources(Map.of(Resource.TITAN, 1));
+			player.setPayWithResources(new PayWith(Map.of(Resource.TITAN, 1)));
 			break;
 		case 4:
-			player.setResources(Map.of(Resource.TITAN, 2));
+			player.setPayWithResources(new PayWith(Map.of(Resource.TITAN, 2)));
 			break;
 		case 5:
-			player.setResources(Map.of(Resource.TITAN, 3));
+			player.setPayWithResources(new PayWith(Map.of(Resource.TITAN, 3)));
 			break;
 		case 6:
-			player.setResources(Map.of(Resource.TITAN, 4));
+			player.setPayWithResources(new PayWith(Map.of(Resource.TITAN, 4)));
 			break;
 		case 7:
-			player.setResources(Map.of(Resource.TITAN, 5));
+			player.setPayWithResources(new PayWith(Map.of(Resource.TITAN, 5)));
 			break;
 		}
-		for (Player playerOnColony : colony.getPlayersOnColony()) {
-			playersHandler.getPlayer(playerOnColony.getName()).setResources(Map.of(Resource.TITAN, 1));
+		for (String playerOnColony : colony.getPlayersOnColony()) {
+			playersHandler.getPlayer(playerOnColony).setPayWithResources(new PayWith(Map.of(Resource.TITAN, 1)));
 		}
-		colony.trade(player);
+		colony.trade(player.getName());
 	}
 
 }

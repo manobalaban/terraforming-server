@@ -51,19 +51,26 @@ public class TerrfaormingMarsController {
 	
 	private static List<SseEmitter> emitters = new CopyOnWriteArrayList<SseEmitter>();
 	private final String UPDATE_ALL_PLAYER = "updateAllPlayer";
-	private final String UPDATE_TABLE = "updateTable";
+	private final String UPDATE_GAME_DATA = "updateGameData";
 
 	@GetMapping("/players")
 	public ResponseEntity<List<Player>> getPlayers(@RequestParam(required = false) String name) {
 		if(name != null) {
 			playersHandler.chosePlayer(name);
 			sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
+			sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		}
 		return new ResponseEntity<List<Player>>(playersHandler.getPlayers(), HttpStatus.OK);
 	}
 	
-	@GetMapping("/table")
-	public ResponseEntity<GameData> getTiles() {
+	@PutMapping("/updatePlayer")
+	public ResponseEntity<List<Player>> updatePlayer(@RequestBody Player player) {
+		playersHandler.updatePlayer(player);
+		return new ResponseEntity<List<Player>>(playersHandler.getPlayers(), HttpStatus.OK);
+	}
+	
+	@GetMapping("/gameData")
+	public ResponseEntity<GameData> getGameData() {
 		return new ResponseEntity<GameData>(TerraformingMarsHandler.getGameData(), HttpStatus.OK);
 	}
 	
@@ -73,7 +80,7 @@ public class TerrfaormingMarsController {
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
 			phaseHandler.nextPhase();
-			sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+			sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		}
 		return new ResponseEntity<Player>(playersHandler.getPlayer(player.getName()), HttpStatus.OK);
 	}
@@ -86,106 +93,106 @@ public class TerrfaormingMarsController {
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
 			phaseHandler.nextPhase();
-			sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+			sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		}
 		return new ResponseEntity<String>(player.getCorporation(), HttpStatus.OK);
 	}
 	
 	@PutMapping("/research")
 	public ResponseEntity<PayOption> researchIntention(@RequestBody Player player) {
-		if(player.getPayingWith() == null) {
+		if(player.getPayingWith() == null || player.getPayingWith().checkEmpty()) {
 			return new ResponseEntity<PayOption>(cardsHandler.checkPayForResearchEffect(player), HttpStatus.OK);
 		}
 		boolean ready = cardsHandler.research(player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
 		if(ready) {
 			phaseHandler.nextPhase();
-			sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+			sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		}
 		return new ResponseEntity<PayOption>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/milestone/{milestone}")
 	public ResponseEntity<PayOption> milestone(@PathVariable String milestone, @RequestBody Player player) {
-		if(player.getPayingWith() == null) {
+		if(player.getPayingWith() == null || player.getPayingWith().checkEmpty()) {
 			return new ResponseEntity<PayOption>(milestonesHandler.checkPayForMilestone(milestone, player), HttpStatus.OK);
 		}
 		milestonesHandler.setMilestone(milestone, player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		return new ResponseEntity<PayOption>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/award/{award}")
 	public ResponseEntity<PayOption> award(@PathVariable String award, @RequestBody Player player) {
-		if(player.getPayingWith() == null) {
+		if(player.getPayingWith() == null || player.getPayingWith().checkEmpty()) {
 			return new ResponseEntity<PayOption>(awardsHandler.checkPayForAward(player), HttpStatus.OK);
 		}
 		awardsHandler.setAward(award, player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		return new ResponseEntity<PayOption>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/planting/{coordinate}")
 	public ResponseEntity<PayOption> planting(@PathVariable String coordinate, @RequestBody Player player) {
-		if(player.getPayingWith() == null) {
+		if(player.getPayingWith() == null || player.getPayingWith().checkEmpty()) {
 			return new ResponseEntity<PayOption>(tileHandler.checkPlantingEffect(player), HttpStatus.OK);
 		}
 		tileHandler.planting(coordinate, player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		return new ResponseEntity<PayOption>(HttpStatus.OK); 
 	}
 	
 	@PutMapping("/action/increaseTemperature")
 	public ResponseEntity<PayOption> increaseTemperature(@RequestBody Player player) {
-		if(player.getPayingWith() == null) {
+		if(player.getPayingWith() == null || player.getPayingWith().checkEmpty()) {
 			return new ResponseEntity<PayOption>(globalParameterHandler.checkIncreaseTemperatureWithHeatEffect(player), HttpStatus.OK);
 		}
 		globalParameterHandler.increaseTemperature(true, player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		return new ResponseEntity<PayOption>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/trade/{colony}")
 	public ResponseEntity<List<PayOption>> trade(@PathVariable String colony, @RequestBody Player player) {
-		if(player.getPayingWith() == null) {
+		if(player.getPayingWith() == null || player.getPayingWith().checkEmpty()) {
 			return new ResponseEntity<List<PayOption>>(coloniesHandler.checkTradeEffect(player, colony), HttpStatus.OK);
 		}
 		coloniesHandler.trade(player, colony);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		return new ResponseEntity<List<PayOption>>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/buyDelegate/{party}")
 	public ResponseEntity<List<PayOption>> buyDelegate(@PathVariable String party, @RequestBody Player player) {
-		if(player.getPayingWith() == null) {
+		if(player.getPayingWith() == null || player.getPayingWith().checkEmpty()) {
 			return new ResponseEntity<List<PayOption>>(turmoilHandler.checkBuyDelegateEffect(player), HttpStatus.OK);
 		}
 		turmoilHandler.buyDelegate(party, player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		return new ResponseEntity<List<PayOption>>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/standardProject/{projectName}")
 	public ResponseEntity<PayOption> standardProject(@PathVariable String projectName, @RequestBody Player player) {
-		if(player.getPayingWith() == null) {
+		if(player.getPayingWith() == null || player.getPayingWith().checkEmpty()) {
 			return new ResponseEntity<PayOption>(standardProjectHandler.checkStandardProjectEffect(projectName, player), HttpStatus.OK);
 		}
 		standardProjectHandler.standardProject(projectName, player);
 		sendEvent(UPDATE_ALL_PLAYER, "allPlayerData", playersHandler.getPlayers());
-		sendEvent(UPDATE_TABLE, "tableData", TerraformingMarsHandler.getGameData());
+		sendEvent(UPDATE_GAME_DATA, "tableData", TerraformingMarsHandler.getGameData());
 		return new ResponseEntity<PayOption>(HttpStatus.OK);
 	}
 	
 	//SSE
 	
 	@CrossOrigin
-	@RequestMapping(value = "/subscribeUsers", consumes = MediaType.ALL_VALUE)
+	@RequestMapping(value = "/subscribePlayers", consumes = MediaType.ALL_VALUE)
 	public SseEmitter subscribe() {
 		SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
 		try {

@@ -20,9 +20,16 @@ public class PhaseHandler {
 		return actualPhase;
 	}
 	
+	public static void setActualPhase(GamePhase actualPhase) {
+		PhaseHandler.actualPhase = actualPhase;
+	}
+
 	public GamePhase nextPhase() {
 		switch (actualPhase) {
 		case ENTER:
+			actualPhase = GamePhase.CHOSE_CARDS;
+			break;
+		case CHOSE_CARDS:
 			actualPhase = GamePhase.CHOSE_CORP;
 			break;
 		case CHOSE_CORP:

@@ -24,6 +24,11 @@ public class OnCardCollected {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
+	
+	public OnCardCollected addToQuantity(int quantity) {
+		this.quantity += quantity;
+		return this;
+	}
 
 	public String getId() {
 		return id;

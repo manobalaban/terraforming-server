@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.terraforming.server.initialize.TerraformingMarsInitialize;
 import com.terraforming.server.model.PayOption;
+import com.terraforming.server.model.PayWith;
 import com.terraforming.server.model.Player;
 
 public class AwardsHandler {
@@ -28,8 +29,8 @@ public class AwardsHandler {
 	}
 	
 	public void setAward(String name, Player actualPlayer) {
-		playersHandler.getPlayer(actualPlayer.getName()).setResources(actualPlayer.getPayingWith());
-		playersHandler.getPlayer(actualPlayer.getName()).setPayingWith(null);
+		playersHandler.getPlayer(actualPlayer.getName()).setPayWithResources(actualPlayer.getPayingWith());
+		playersHandler.getPlayer(actualPlayer.getName()).setPayingWith(new PayWith());
 		awards.put(name, true);
 	}
 	

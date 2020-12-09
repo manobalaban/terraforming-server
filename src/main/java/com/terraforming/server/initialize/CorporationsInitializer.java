@@ -28,7 +28,7 @@ public class CorporationsInitializer {
 		corporations.put("c9", new Corporation("c9", Arrays.asList(Tag.ENERGY), Map.of(Resource.CREDIT, 48, Resource.ENERGY_PROD, 1), new CardEffect("c9", Arrays.asList(EffectType.CARD_PLAY_INTENTION, EffectType.STANDARD_PROJECT))));
 		corporations.put("c10", new Corporation("c10", Arrays.asList(Tag.EARTH), Map.of(Resource.CREDIT, 40), new CardAction("c10")));
 		corporations.put("c11", new Corporation("c11", Arrays.asList(Tag.EARTH), Map.of(Resource.CREDIT, 60), new CardEffect("c11", Arrays.asList(EffectType.CARD_PLAY_INTENTION))));
-		corporations.put("c12", new Corporation("c12", Arrays.asList(Tag.JUVIAN), Map.of(Resource.CREDIT, 42, Resource.TITAN_PROD, 1, Resource.CREDIT_PROD, 1), new CardEffect("c12", Arrays.asList(EffectType.CARD_PLAY), true)));
+		corporations.put("c12", new Corporation("c12", Arrays.asList(Tag.JOVIAN), Map.of(Resource.CREDIT, 42, Resource.TITAN_PROD, 1, Resource.CREDIT_PROD, 1), new CardEffect("c12", Arrays.asList(EffectType.CARD_PLAY), true)));
 		corporations.put("c13", new Corporation("c13", Arrays.asList(Tag.VENUS, Tag.PLANT), Map.of(Resource.CREDIT, 47, Resource.PLANT_PROD, 1), new CardEffect("c13", Arrays.asList(EffectType.GLOBAL_PARAMETER_MODIFY), true)));
 		corporations.put("c14", new Corporation("c14", Arrays.asList(Tag.VENUS), Map.of(Resource.CREDIT, 42), new CardAction("c14"), new OnCardCollected("c14", 0, CardResource.FLOATER)));
 		corporations.put("c15", new Corporation("c15", Arrays.asList(Tag.BUILDING), Map.of(Resource.CREDIT, 35, Resource.STEEL_PROD, 1, Resource.STEEL, 1), new CardEffect("c15", Arrays.asList(EffectType.CHANGE_PRODUCTION))));
@@ -43,7 +43,7 @@ public class CorporationsInitializer {
 		corporations.put("c24", new Corporation("c24", Arrays.asList(Tag.ANIMAL), Map.of(Resource.CREDIT, 45, Resource.CREDIT_PROD, 2), new CardEffect("c24", Arrays.asList(EffectType.CARD_PLAY)), new OnCardCollected("c24", 1, CardResource.ANIMAL)));
 		corporations.put("c25", new Corporation("c25", Arrays.asList(Tag.NONE), Map.of(Resource.CREDIT, 50, Resource.CREDIT_PROD, 5, Resource.TITAN, 5), new CardEffect("c25", Arrays.asList(EffectType.RESEARCH_PRICE))));
 		corporations.put("c26", new Corporation("c26", Arrays.asList(Tag.NONE), Map.of(Resource.CREDIT, 45), new CardEffect("c26", Arrays.asList(EffectType.BUY_COLONIE), true)));
-		corporations.put("c27", new Corporation("c27", Arrays.asList(Tag.JUVIAN), Map.of(Resource.CREDIT, 48), new CardEffect("c27", Arrays.asList(EffectType.USING_HEAT)),new CardAction("c27"), new OnCardCollected("c27", 0, CardResource.FLOATER)));
+		corporations.put("c27", new Corporation("c27", Arrays.asList(Tag.JOVIAN), Map.of(Resource.CREDIT, 48), new CardEffect("c27", Arrays.asList(EffectType.USING_HEAT)),new CardAction("c27"), new OnCardCollected("c27", 0, CardResource.FLOATER)));
 		corporations.put("c28", new Corporation("c28", Arrays.asList(Tag.BUILDING), Map.of(Resource.CREDIT, 54), new CardEffect("c28", Arrays.asList(EffectType.PLACE_TILE), true)));
 		corporations.put("c29", new Corporation("c29", Arrays.asList(Tag.NONE), Map.of(Resource.CREDIT, 53), new CardEffect("c29", Arrays.asList(EffectType.PRODUCTION)), new OnCardCollected("c29", 0, CardResource.PRESERVATION)));
 		corporations.put("c30", new Corporation("c30", Arrays.asList(Tag.WILD), Map.of(Resource.CREDIT, 36), new CardAction("c30")));

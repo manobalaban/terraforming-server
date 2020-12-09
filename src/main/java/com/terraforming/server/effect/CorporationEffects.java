@@ -24,7 +24,7 @@ public class CorporationEffects {
 	
 	public static void c12(BasicCard card, Player effectOwner) {
 		for(Tag tag : card.getTags()) {
-			if(tag == Tag.JUVIAN) {
+			if(tag == Tag.JOVIAN) {
 				effectOwner.getResources().put(Resource.CREDIT_PROD, effectOwner.getResources().get(Resource.CREDIT_PROD) + 1);
 			}
 		}

@@ -10,6 +10,8 @@ import com.terraforming.server.model.Player;
 public class PlayersHandler {
 	private static PlayersHandler instance = null;
 	
+	private PhaseHandler phaseHandler = PhaseHandler.getIntance();
+	
 	private static List<Player> players = new CopyOnWriteArrayList<Player>();
 	
 	private PlayersHandler() {}
@@ -43,9 +45,9 @@ public class PlayersHandler {
 		for(int i = 1; i < players.size(); i++) {
 			if(players.get(i).isActive() == true) {
 				actualPlayer = players.get(i);
-				if(i < (players.size() -1) && !players.get(i +1).isReady()) {
+				if(i < (players.size() -1)) {
 					nextPlayer = players.get(i +1);
-				} else if(i == players.size() - 1 && !players.get(1).isReady()) {
+				} else if(i == players.size() - 1) {
 					nextPlayer = players.get(1);
 				}
 			}
@@ -56,11 +58,25 @@ public class PlayersHandler {
 		}
 	}
 	
+	public void updatePlayer(Player actualPlayer) {
+		int index = 0;
+		for(int i = 0; i< players.size(); i++) {
+			if(players.get(i).getName().equals(actualPlayer.getName())) {
+				index = i;
+			}
+		}
+		players.set(index, actualPlayer);
+	}
+	
 	public void chosePlayer(String name) {
 		if(name.equals("admin")) {
+			if(!getPlayer(name).isChosed()) {
+				phaseHandler.nextPhase();
+			}
+			getPlayer(name).setChosed(true);
 			List<Player> removePLayerList = new CopyOnWriteArrayList<>();
 			for(Player player : players) {
-				if(player.isChosed() == false && !player.getName().equals("admin")) {
+				if(player.isChosed() == false) {
 					removePLayerList.add(player);
 				}
 			}
@@ -75,10 +91,9 @@ public class PlayersHandler {
 				}
 			}
 			Collections.sort(players, (a, b) -> a.getOrder() - b.getOrder());
-			ColoniesHandler.init(players.size());
+			ColoniesHandler.init(players.size() - 1);
 			TurmoilHandler.init(players);
-		} else {
-			getPlayer(name).setChosed(true);
 		}
+		getPlayer(name).setChosed(true);
 	}
 }

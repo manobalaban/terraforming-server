@@ -34,12 +34,12 @@ public class TerraformingMarsInitialize {
 		return cards;
 	}
 	
-	public static Map<String, Player> initMilestones() {
-		Map<String, Player> milestones = new HashMap<String, Player>();
+	public static Map<String, String> initMilestones() {
+		Map<String, String> milestones = new HashMap<String, String>();
 		List<String> names = new CopyOnWriteArrayList<>(Arrays.asList(
 				"builder", "diversifier", "ecologist", "energizer", "gardener",
 				"generalist", "hoverlord", "legend", "mayor", "planner",
-				"polarexplorer", "rimsettel", "specialist", "tactican", "terraformer", "tycoon"));
+				"polarexplorer", "rimsettler", "specialist", "tactician", "terraformer", "tycoon"));
 		Collections.shuffle(names);
 		for(int i = 0; i < 10; i++) {
 			milestones.put(names.get(i), null);
@@ -50,8 +50,8 @@ public class TerraformingMarsInitialize {
 	public static Map<String, Boolean> initAwards() {
 		Map<String, Boolean> awards = new HashMap<String, Boolean>();
 		List<String> names = new CopyOnWriteArrayList<>(Arrays.asList(
-				"banker", "benfactor", "celebrity", "contractor", "culivator",
-				"desertsettler", "eccentic", "industrialist", "landlord", "magnate",
+				"banker", "benfactor", "celebrity", "contractor", "cultivator",
+				"desertsettler", "eccentric", "industrialist", "landlord", "magnate",
 				"miner", "realestate", "scientist", "spacebaron", "thermalist", "venuphile"));
 		Collections.shuffle(names);
 		for(int i = 0; i < 10; i++) {
