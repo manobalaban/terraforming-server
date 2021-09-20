@@ -44,24 +44,20 @@ public class GlobalParameterHandler {
 		return venus;
 	}
 	
-	public boolean increaseOceans(boolean increase, Player actualPlayer) {
+	public void increaseOceans(boolean increase, Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		boolean possible = false;
 		if(increase && oceans < 21) {
 			oceans++;
 			player.increaseTr(1);
 			//TODO ocean title placing is still missing
-			possible = true;
 		} else if(!increase && oceans > 0) {
 			oceans--;
-			possible = true;
 		}
-		return possible;
 	}
 	
-	public boolean increaseTemperature(boolean increase, Player actualPlayer) {
+	public void increaseTemperature(boolean increase, Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		boolean possible = false;
+		player.setPayWithResources(actualPlayer.getPayingWith());
 		if(increase && temperature < 9) {
 			temperature++;
 			if(temperature == -24 || temperature == -20) {
@@ -71,34 +67,26 @@ public class GlobalParameterHandler {
 				increaseOceans(true, player);
 			}
 			player.increaseTr(1);
-			possible = true;
 		} else if(!increase && temperature > -30) {
 			temperature--;
-			possible = true;
 		}
-		return possible;
 	}
 	
-	public boolean increaseOxygen(boolean increase, Player actualPlayer) {
+	public void increaseOxygen(boolean increase, Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		boolean possible = false;
 		if(increase && oxygen < 15) {
 			oxygen += 0.5;
 			if(oxygen == 4) {
 				increaseTemperature(true, player);
 			}
 			player.increaseTr(1);
-			possible = true;
 		} else if(!increase && oxygen > 0) {
 			oxygen -= 0.5;
-			possible = true;
 		}
-		return possible;
 	}
 	
-	public boolean increaseVenus(boolean increase, Player actualPlayer) {
+	public void increaseVenus(boolean increase, Player actualPlayer) {
 		Player player = playersHandler.getPlayer(actualPlayer.getName());
-		boolean possible = false;
 		if(increase && venus < 30) {
 			venus ++;
 			if(venus == 4) {
@@ -114,12 +102,9 @@ public class GlobalParameterHandler {
 				//TODO SSE for getting the resource type
 			}
 			player.increaseTr(1);
-			possible = true;
 		} else if(!increase && venus > 0) {
 			venus ++;
-			possible = true;
 		}
-		return possible;
 	}
 	
 	public PayOption checkIncreaseTemperatureWithHeatEffect(Player actualPlayer) {

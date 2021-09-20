@@ -22,6 +22,7 @@ public class TurmoilHandler {
 	private static List<String> freeDelegates = new CopyOnWriteArrayList<String>();
 	private static Map<String, Integer> delegates = new HashMap<String, Integer>();
 	private static String dominantParty = "";
+	private static String president = "admin";
 	
 	
 	private TurmoilHandler() {}
@@ -49,11 +50,17 @@ public class TurmoilHandler {
 	public String getDominantParty() {
 		return dominantParty;
 	}
+	
+	public String getPresident() {
+		return president;
+	}
 
 	public static void init(List<Player> players) {
 		for(Player player : players) {
-			freeDelegates.add(player.getName());
-			delegates.put(player.getName(), 6);
+			if(!player.getName().equals("admin")) {
+				freeDelegates.add(player.getName());
+				delegates.put(player.getName(), 6);
+			}
 		}
 	}
 

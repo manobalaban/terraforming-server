@@ -33,6 +33,7 @@ public class TerraformingMarsHandler {
 		gameData.setFreeDelegates(TurmoilHandler.getInstance().getFreeDelegates());
 		gameData.setDelegates(TurmoilHandler.getInstance().getDelegates());
 		gameData.setDominantParty(TurmoilHandler.getInstance().getDominantParty());
+		gameData.setPresident(TurmoilHandler.getInstance().getPresident());
 		return gameData;
 	}
 	

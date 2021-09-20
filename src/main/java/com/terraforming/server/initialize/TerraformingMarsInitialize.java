@@ -91,6 +91,7 @@ public class TerraformingMarsInitialize {
 			}
 			party.setPartyBonus(new Random().nextInt(2) + 1);
 			party.setPartyEffect(new Random().nextInt(4) + 1);
+			parties.put(name, party);
 		}
 		return parties;
 	}

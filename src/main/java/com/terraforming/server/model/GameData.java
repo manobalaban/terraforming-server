@@ -22,6 +22,7 @@ public class GameData {
 	private static List<String> freeDelegates;
 	private static Map<String, Integer> delegates;
 	private static String dominantParty;
+	private static String president;
 	
 	public GamePhase getActualPhase() {
 		return actualPhase;
@@ -100,6 +101,12 @@ public class GameData {
 	}
 	public void setDominantParty(String dominantParty) {
 		GameData.dominantParty = dominantParty;
+	}
+	public String getPresident() {
+		return president;
+	}
+	public void setPresident(String president) {
+		GameData.president = president;
 	}
 	
 }
